@@ -7,7 +7,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .bot import DeltaBot
+from .bot import _LOGGER, DeltaBot
 from .const import CONF_DELTACHAT_RELAY, DeltaChatData
 
 _PLATFORMS: list[Platform] = [Platform.NOTIFY]
@@ -25,6 +25,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: DeltaChatConfigEntry) ->
     try:
         client = DeltaBot(conf.relay)
         client.is_ok()
+        _LOGGER.info("SETUP OK")
     except Exception as ex:
         raise ConfigEntryNotReady("Something went wrong") from ex
 

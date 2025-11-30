@@ -29,14 +29,15 @@ async def async_setup_entry(
     async_add_entities([DeltaChatNotify(config_entry)])
 
 
-class DeltaChatNotify(DeltaBot, NotifyEntity):
+class DeltaChatNotify(NotifyEntity):
     """Representation of a notification entity service that can send messages using DeltaChat."""
 
     def __init__(self, config: DeltaChatConfigEntry) -> None:
         """Initialize a DeltaChat notification."""
         self._attr_unique_id = "bot"
-        super().__init__(config.data[CONF_DELTACHAT_RELAY])
+        self.bot = DeltaBot(config.data[CONF_DELTACHAT_RELAY])
 
     async def async_send_message(self, message: str, title: str | None = None) -> None:
         """Send a message."""
         _LOGGER.info("Send message %s", message)
+        await self.bot.send_message(message, "ici")
