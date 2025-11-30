@@ -696,6 +696,9 @@ deebot-client==16.3.0
 # homeassistant.components.sonos
 defusedxml==0.7.1
 
+# homeassistant.components.delta_chat
+deltabot_cli==8.0.0
+
 # homeassistant.components.deluge
 deluge-client==1.10.2
 
