@@ -2,35 +2,37 @@
 
 from __future__ import annotations
 
-from deltabot_cli import BotCli
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
 
-# For your initial PR, limit it to 1 platform.
+from .bot import DeltaBot
+from .const import CONF_DELTACHAT_RELAY, DeltaChatData
+
 _PLATFORMS: list[Platform] = [Platform.NOTIFY]
 
-# TODO Create ConfigEntry type alias with API object
-# TODO Rename type alias and update all entry annotations
-type New_NameConfigEntry = ConfigEntry[BotCli]  # noqa: F821
+type DeltaChatConfigEntry = ConfigEntry[DeltaChatData]
 
 
-# TODO Update entry annotation
-async def async_setup_entry(hass: HomeAssistant, entry: New_NameConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: DeltaChatConfigEntry) -> bool:
     """Set up Delta Chat from a config entry."""
 
-    # TODO 1. Create API instance
-    # TODO 2. Validate the API connection (and authentication)
-    # TODO 3. Store an API object for your platforms to access
-    # entry.runtime_data = MyAPI(...)
+    conf = DeltaChatData(entry.data[CONF_DELTACHAT_RELAY])
+
+    entry.runtime_data = conf
+
+    try:
+        client = DeltaBot(conf.relay)
+        client.is_ok()
+    except Exception as ex:
+        raise ConfigEntryNotReady("Something went wrong") from ex
 
     await hass.config_entries.async_forward_entry_setups(entry, _PLATFORMS)
 
     return True
 
 
-# TODO Update entry annotation
-async def async_unload_entry(hass: HomeAssistant, entry: New_NameConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: DeltaChatConfigEntry) -> bool:
     """Unload a config entry."""
     return await hass.config_entries.async_unload_platforms(entry, _PLATFORMS)

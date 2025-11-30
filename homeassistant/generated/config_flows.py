@@ -135,6 +135,7 @@ FLOWS = {
         "datadog",
         "deako",
         "deconz",
+        "delta_chat",
         "deluge",
         "denonavr",
         "devialet",

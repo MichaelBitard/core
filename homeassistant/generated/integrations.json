@@ -1251,6 +1251,12 @@
       "integration_type": "virtual",
       "supported_by": "opower"
     },
+    "delta_chat": {
+      "name": "Delta Chat",
+      "integration_type": "hub",
+      "config_flow": true,
+      "iot_class": "cloud_push"
+    },
     "deluge": {
       "name": "Deluge",
       "integration_type": "service",

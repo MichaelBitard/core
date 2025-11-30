@@ -1,18 +1,13 @@
 {
   "domain": "delta_chat",
   "name": "Delta Chat",
-  "codeowners": [
-    "@agileek"
-  ],
+  "codeowners": ["@MichaelBitard"],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://www.home-assistant.io/integrations/delta_chat",
-  "homekit": {},
   "iot_class": "cloud_push",
   "quality_scale": "bronze",
-  "requirements": [
-    "deltabot_cli==8.0.0"
-  ],
+  "requirements": ["deltabot_cli==8.0.0"],
   "ssdp": [],
   "zeroconf": []
 }

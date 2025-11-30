@@ -337,6 +337,8 @@ build.json @home-assistant/supervisor
 /homeassistant/components/default_config/ @home-assistant/core
 /tests/components/default_config/ @home-assistant/core
 /homeassistant/components/delijn/ @bollewolle @Emilv2
+/homeassistant/components/delta_chat/ @MichaelBitard
+/tests/components/delta_chat/ @MichaelBitard
 /homeassistant/components/deluge/ @tkdrob
 /tests/components/deluge/ @tkdrob
 /homeassistant/components/demo/ @home-assistant/core
