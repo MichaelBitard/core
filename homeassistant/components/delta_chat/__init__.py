@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
+from homeassistant.const import CONF_EMAIL, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
@@ -18,7 +18,9 @@ type DeltaChatConfigEntry = ConfigEntry[DeltaChatData]
 async def async_setup_entry(hass: HomeAssistant, entry: DeltaChatConfigEntry) -> bool:
     """Set up Delta Chat from a config entry."""
 
-    conf = DeltaChatData(entry.data[CONF_DELTACHAT_RELAY])
+    _LOGGER.info("INIT %s", entry)
+    _LOGGER.info("INIT %s", entry.data)
+    conf = DeltaChatData(entry.data[CONF_DELTACHAT_RELAY], entry.data[CONF_EMAIL])
 
     entry.runtime_data = conf
 

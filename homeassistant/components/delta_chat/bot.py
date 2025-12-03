@@ -48,7 +48,7 @@ class DeltaBot:
         """Placeholder for __init__ validation."""
         return True
 
-    async def init(self) -> bool:
+    async def init(self) -> str | None:
         """Initialize the bot."""
         accounts_dir = self.get_accounts_dir()
 
@@ -58,15 +58,11 @@ class DeltaBot:
 
             core_version = rpc.get_system_info().deltachat_core_version
             bot.logger.debug("Running deltachat core %s", core_version)
-            return _init_cmd(self, bot, f"DCACCOUNT:https://{self.relay}/new")
-
-    async def start(self) -> None:
-        """Listen for incoming messages."""
-        accounts_dir = self.get_accounts_dir()
-        with IOTransport(accounts_dir=accounts_dir) as trans:
-            rpc = Rpc(trans)
-            bot = Bot(rpc, self._hooks, _LOGGER)
-            return _serve_cmd(self, bot)
+            result = _init_cmd(self, bot, f"DCACCOUNT:https://{self.relay}/new")
+            if result:
+                accid = bot.rpc.get_all_account_ids()[0]
+                return bot.rpc.get_chat_securejoin_qr_code(accid, None)
+            return None
 
     async def send_message(self, message: str, target: str) -> None:
         """Send a message."""
@@ -78,23 +74,23 @@ class DeltaBot:
             core_version = rpc.get_system_info().deltachat_core_version
             bot.logger.debug("Running deltachat core %s", core_version)
             accid = bot.rpc.get_all_account_ids()[0]
+            qrdata = bot.rpc.get_chat_securejoin_qr_code(accid, None)
+            _LOGGER.info("QRDATA %s", qrdata)
 
             # first fetch incoming messages to have updated chats state
             bot.logger.info("first syncing chats state...")
-            bot.rpc.accounts_background_fetch(60)
+            bot.rpc.background_fetch(60)
 
             bot.logger.info("sending message...")
 
-            qrdata = bot.rpc.get_chat_securejoin_qr_code(accid, None)
             contacts = bot.rpc.get_contacts(accid, DC_STR_CONTACT_VERIFIED, "")
 
-            _LOGGER.info("QRDATA %s", qrdata)
             _LOGGER.info("CONTACTS %s", contacts)
+            contact = next(x for x in contacts if x["address"] == target)
             chat_id = bot.rpc.create_chat_by_contact_id(
-                # chat_id = bot.rpc.get_chat_id_by_contact_id(
                 accid,
-                11,
-            )  # 11 = Take from contacts
+                contact["id"],
+            )
             _LOGGER.info("CHAT_ID %s", chat_id)
 
             msgid = bot.rpc.send_msg(accid, chat_id, MsgData(text=message))
@@ -140,8 +136,9 @@ def _init_cmd(_cli: DeltaBot, bot: Bot, full_relay: str) -> bool:
     pbar.close()
     if pbar.progress == -1:
         bot.logger.error("Configuration failed.")
-    else:
-        bot.logger.info("Account configured successfully.")
+        raise ConfigurationFailed
+
+    bot.logger.info("Account configured successfully.")
 
     return pbar.progress == pbar.total
 
@@ -180,3 +177,7 @@ def _get_addresses(rpc: Rpc, accid: int) -> list[str]:
 
 class NoAccount(HomeAssistantError):
     """Error to indicate there is no account."""
+
+
+class ConfigurationFailed(HomeAssistantError):
+    """The configuration failed."""
