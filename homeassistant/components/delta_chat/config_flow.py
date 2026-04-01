@@ -117,7 +117,11 @@ class DeltaChatConfigFlow(ConfigFlow, domain=DOMAIN):
             # User is done adding emails, create the config entry.
             await self.async_set_unique_id(IDENTIFIER)
             self._abort_if_unique_id_configured()
-            return self.async_create_entry(title="Delta Bot", data=self.data)
+            return self.async_create_entry(
+                title=f"Delta Bot {self.data['qrdata']} plop",
+                description="This is a description",
+                data=self.data,
+            )
 
         return self.async_show_form(
             step_id="email", data_schema=STEP_EMAIL_SCHEMA, errors=errors
@@ -155,6 +159,16 @@ class DeltaChatConfigFlow(ConfigFlow, domain=DOMAIN):
             data_schema=STEP_EMAIL_SCHEMA,
             errors=errors,
         )
+
+    async def async_get_config_entry_diagnostics(
+        hass: HomeAssistant, entry: MyConfigEntry
+    ) -> dict[str, Any]:
+        """Return diagnostics for a config entry."""
+
+        return {
+            "entry_data": entry.data,
+            "data": entry.runtime_data.data,
+        }
 
 
 class CannotConnect(HomeAssistantError):
